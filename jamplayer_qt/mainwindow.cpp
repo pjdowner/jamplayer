@@ -173,7 +173,15 @@ void MainWindow::keyed(int k)
     } else if (k == 2) {
         tempo = tempo + 0.01;
         m_player->setTempo(tempo);
+    } else if (k == 3) {
+        QTime t = m_player->position();
+        qDebug() << t;
+        t = t.addSecs(-10);
+        qDebug() << t;
+        m_player->setPosition(t);
+
     }
+
 }
 
 void MainWindow::onStateChanged()

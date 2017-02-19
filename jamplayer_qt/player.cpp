@@ -79,6 +79,8 @@ void Player::setUri(const QString & uri)
         m_pipeline->link("decoder", sink);
 */
 
+        currentFile = uri;
+
         QString pipe1Descr = QString(   "filesrc location=\"%1\" ! "
                                         "decodebin ! "
                                         "audioconvert ! "
@@ -105,7 +107,7 @@ void Player::setUri(const QString & uri)
     }
 
     if (m_pipeline) {
-        m_pipeline->setProperty("uri", realUri);
+        m_pipeline->setProperty("location", uri);
     }
 }
 
@@ -172,6 +174,9 @@ void Player::setTempo(float tempo)
 
 void Player::setVolume(int volume)
 {
+
+
+
     if (m_pipeline) {
         QGst::StreamVolumePtr svp =
             m_pipeline.dynamicCast<QGst::StreamVolume>();
@@ -202,6 +207,10 @@ QGst::State Player::state() const
 
 void Player::play()
 {
+    if (!m_pipeline) {
+        setUri(currentFile);
+    }
+
     if (m_pipeline) {
         m_pipeline->setState(QGst::StatePlaying);
     }
@@ -218,7 +227,7 @@ void Player::stop()
 {
     if (m_pipeline) {
         m_pipeline->setState(QGst::StateNull);
-
+        m_pipeline.clear();
         //once the pipeline stops, the bus is flushed so we will
         //not receive any StateChangedMessage about this.
         //so, to inform the ui, we have to emit this signal manually.

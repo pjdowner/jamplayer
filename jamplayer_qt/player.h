@@ -36,6 +36,7 @@ public:
     QTime position() const;
     void setPosition(const QTime & pos);
     int volume() const;
+    QString currentFile;
 
     QTime length() const;
     QGst::State state() const;

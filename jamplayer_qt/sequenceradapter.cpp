@@ -199,6 +199,9 @@ void SequencerAdapter::dumpEvent(SequencerEvent* sev)
         } else if (k == 22) {
             qDebug() << "PJD rocks! 2";
             emit keyPressed(2);
+        } else if (k == 21) {
+            qDebug() << "PJD time travel!";
+            emit keyPressed(3);
         }
         break;
     }
