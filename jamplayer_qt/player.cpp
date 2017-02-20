@@ -3,6 +3,8 @@
     Copyright (C) 2011 Collabora Ltd.
       @author George Kiagiadakis <george.kiagiadakis@collabora.co.uk>
 
+    Copyright (C) 2017 Philip Downer <phil@pjd.me.uk>
+
     This library is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published
     by the Free Software Foundation; either version 2.1 of the License, or
@@ -135,6 +137,43 @@ void Player::setPosition(const QTime & pos)
     m_pipeline->sendEvent(evt);
 }
 
+void Player::pitchDown()
+{
+
+    QGst::ElementPtr t = m_pipeline->getElementByName("t");
+
+    qDebug() << t->property("pitch");
+
+    QGlib::Value p = t->property("pitch");
+    float f;
+
+    bool ok;
+    f = p.get<float>(&ok);
+
+
+    f = f - 0.05;
+    t->setProperty("pitch", f);
+}
+
+void Player::pitchUp()
+{
+
+    QGst::ElementPtr t = m_pipeline->getElementByName("t");
+
+    qDebug() << t->property("pitch");
+
+    QGlib::Value p = t->property("pitch");
+    float f;
+
+    bool ok;
+    f = p.get<float>(&ok);
+
+    f = f + 0.05;
+    t->setProperty("pitch", f);
+}
+
+
+
 int Player::volume() const
 {
     if (m_pipeline) {
@@ -162,9 +201,18 @@ void Player::setTempo(float tempo)
         ptr = t->listProperties();
 
 
+
+
         for (int i = 0; i < ptr.size(); ++i) {
             qDebug()<<ptr.at(i)->name();
+
+
+
         }
+
+        QGlib::ParamSpecPtr p = t->findProperty("tempo");
+
+        qDebug() << t->property("tempo");
 
         //ptr t->listProperties();
         t->setProperty("tempo", tempo);

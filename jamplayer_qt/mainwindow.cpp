@@ -1,3 +1,25 @@
+/*
+   Copyright (C) 2010 Marco Ballesio <gibrovacco@gmail.com>
+   Copyright (C) 2011 Collabora Ltd.
+     @author George Kiagiadakis <george.kiagiadakis@collabora.co.uk>
+
+   Copyright (C) 2017 Philip Downer <phil@pjd.me.uk>
+
+   This library is free software; you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as published
+   by the Free Software Foundation; either version 2.1 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
 #include "sequenceradapter.h"
 #include "player.h"
 #include "mainwindow.h"
@@ -118,6 +140,12 @@ void MainWindow::createUI(QBoxLayout *appLayout)
 
     m_stopButton = initButton(QStyle::SP_MediaStop, tr("Stop"),
                               m_player, SLOT(stop()), btnLayout);
+
+    m_pitchDown = initButton(QStyle::SP_ArrowDown, tr("Pitch Down"),
+                              m_player, SLOT(pitchDown()), btnLayout);
+
+    m_pitchUp = initButton(QStyle::SP_ArrowUp, tr("Pitch Up"),
+                              m_player, SLOT(pitchUp()), btnLayout);
 
     m_fullScreenButton = initButton(QStyle::SP_TitleBarMaxButton, tr("Fullscreen"),
                                     this, SLOT(toggleFullScreen()), btnLayout);

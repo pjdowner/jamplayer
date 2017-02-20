@@ -47,6 +47,8 @@ public Q_SLOTS:
     void stop();
     void setVolume(int volume);
     void setTempo(float tempo);
+    void pitchDown();
+    void pitchUp();
 
 Q_SIGNALS:
     void positionChanged();

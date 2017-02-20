@@ -60,6 +60,9 @@ private:
     QToolButton *m_playButton;
     QToolButton *m_pauseButton;
     QToolButton *m_stopButton;
+    QToolButton *m_pitchDown;
+    QToolButton *m_pitchUp;
+
     QSlider *m_positionSlider;
     QSlider *m_volumeSlider;
     QLabel *m_positionLabel;

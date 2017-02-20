@@ -1,3 +1,23 @@
+/***************************************************************************
+ *   based on KMetronome - ALSA Sequencer based MIDI metronome             *         *
+ *   Copyright (C) 2005-2014 Pedro Lopez-Cabanillas <plcl@users.sf.net>    *
+ *   Copyright (C) 2017 Philip Downer <phil@pjd.me.uk>                    *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the Free Software           *
+ *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,            *
+ *   MA 02110-1301, USA                                                    *
+ ***************************************************************************/
 
 #include "sequenceradapter.h"
 #include "defs.h"
@@ -436,10 +456,10 @@ void SequencerAdapter::subscribe(const QString& portName)
 
 void SequencerAdapter::handleSequencerEvent(SequencerEvent *ev)
 {
-    int when = 0;
+
     switch (ev->getSequencerType()) {
     case SND_SEQ_EVENT_USR0:
-        when = ev->getTick() + m_patternDuration;
+        //when = ev->getTick() + m_patternDuration;
         //if (m_patternMode)
             //metronome_grid_pattern(when);
         //else
