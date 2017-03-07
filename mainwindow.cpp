@@ -80,7 +80,7 @@ void MainWindow::onStateChanged()
 
 void MainWindow::updateList(QJsonArray ja)
 {
-
+    songList->clear();
     for (int i =0; i < ja.size(); i++) {
         if (ja[i].isObject()) {
             QJsonObject jo = ja[i].toObject();
@@ -100,7 +100,7 @@ void MainWindow::createUI(QBoxLayout *appLayout)
     positionLabel = new QLabel();
     QFont f( "Arial", 20);
     positionLabel->setFont(f);
-    positionLabel->setText("moo");
+    positionLabel->setText("hh:mm:ss.zzz");
 
     positionSlider = new QSlider(Qt::Horizontal);
     positionSlider->setTickPosition(QSlider::TicksBelow);
@@ -165,10 +165,27 @@ void MainWindow::open()
 
     if (!fileName.isEmpty()) {
         bool ok;
+        QString title = "";
+        QRegularExpression re("([^\\/]*)$");
+        QRegularExpressionMatch match = re.match(fileName);
+        if (match.hasMatch()) {
+            title = match.captured(1);
+        }
+
         QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
-                                                 "Please Enter a name for " + fileName, QLineEdit::Normal,
-                                                 QDir::home().dirName(), &ok);
-        new QListWidgetItem(text, songList );
+                                                 "Please Enter a name for " + fileName, QLineEdit::Normal, title
+                                                 , &ok);
+        QJsonObject song {{"name", text}, {"location", fileName}};
+
+        MD->addSong(song);
+
+        //new QListWidgetItem(text, songList );
+        QJsonArray ja = MD->loadData();
+        if ( ja.size() < 1) {
+            qDebug() <<"fail";
+        }
+        updateList(ja);
+
     }
 }
 

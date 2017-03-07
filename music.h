@@ -19,6 +19,7 @@ public:
 
     QJsonArray loadData();
     QString getLocation(QString name);
+    void addSong(QJsonObject song);
 
 private:
     QJsonArray ja;

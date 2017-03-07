@@ -27,6 +27,20 @@ QString Music::getLocation(QString name){
     return("");
 }
 
+void Music::addSong(QJsonObject song)
+{
+    QFile d("/home/phil/songs.json");
+    if (!d.open(QIODevice::WriteOnly)) {
+        qWarning("Couldn't open file.");
+    } else {
+
+        ja.append(song);
+        QJsonDocument jd(ja);
+        d.write(jd.toJson());
+        d.close();
+    }
+}
+
 QJsonArray Music::loadData()
 {
     QFile d("/home/phil/songs.json");
