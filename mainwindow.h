@@ -31,9 +31,11 @@ public:
 private Q_SLOTS:
     void open();
     void loadFile();
-    void openFile(const QString & fileName);
+    void openFile(const QString & fileName, const float pitch);
     void onStateChanged();
     void onPositionChanged();
+    void pitchDown();
+    void pitchUp();
 
 private:
     Player *jam_player;
@@ -45,6 +47,8 @@ private:
     bool loadData();
     void readJson(QJsonObject &json);
     void updateList(QJsonArray);
+
+
 
     QSlider *positionSlider;
     QLabel *positionLabel;

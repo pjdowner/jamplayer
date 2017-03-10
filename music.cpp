@@ -12,6 +12,22 @@ Music::~Music()
 
 }
 
+float Music::getPitch(QString name){
+    qDebug() << "search: " << name;
+
+    for (int i =0; i < ja.size(); i++) {
+        if (ja[i].isObject()) {
+            QJsonObject jo = ja[i].toObject();
+            if (QString::compare( jo.value("name").toString(), name, Qt::CaseInsensitive) == 0){
+                qDebug() << "getpitch " << jo.value("pitch");
+
+                return jo.value("pitch").toDouble();
+            }
+        }
+    }
+    return(1.0);
+}
+
 QString Music::getLocation(QString name){
     qDebug() << "search: " << name;
 
@@ -38,6 +54,39 @@ void Music::addSong(QJsonObject song)
         QJsonDocument jd(ja);
         d.write(jd.toJson());
         d.close();
+    }
+}
+
+void Music::updateSong(QJsonObject details)
+{
+
+    QFile d("/home/phil/songs.json");
+    if (!d.open(QIODevice::WriteOnly)) {
+        qWarning("Couldn't open file.");
+    } else {
+        for (int i =0; i < ja.size(); i++) {
+            if (ja[i].isObject()) {
+                QJsonObject jo = ja[i].toObject();
+                if (QString::compare( jo.value("name").toString(), details.value("name").toString(), Qt::CaseInsensitive) == 0){
+
+                    QString field = details.value("field").toString();
+                    QJsonValue val = details.value(field);
+
+                    //if (!jo.contains(field)) {
+                        jo.insert(details.value("field").toString(), val);
+
+                    //} else {
+                    //    jo.value(field) = val;
+                    //}
+
+                    ja[i] = jo;
+                    QJsonDocument jd(ja);
+                    d.write(jd.toJson());
+                    d.close();
+                    return;
+                }
+            }
+        }
     }
 }
 

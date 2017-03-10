@@ -138,10 +138,10 @@ void MainWindow::createUI(QBoxLayout *appLayout)
                               jam_player, SLOT(stop()), btnLayout);
 
     pitchDownButton = initButton(QStyle::SP_ArrowDown, tr("Pitch Down"),
-                              jam_player, SLOT(pitchDown()), btnLayout);
+                              this, SLOT(pitchDown()), btnLayout);
 
     pitchUpButton = initButton(QStyle::SP_ArrowUp, tr("Pitch Up"),
-                              jam_player, SLOT(pitchUp()), btnLayout);
+                              this, SLOT(pitchUp()), btnLayout);
 
     btnLayout->addStretch();
 
@@ -156,8 +156,39 @@ void MainWindow::loadFile()
 
     QString loc = MD->getLocation(curr->text());
 
-    openFile(loc);
+    float p = MD->getPitch(curr->text());
+
+    openFile(loc, p);
 }
+
+void MainWindow::pitchDown()
+{
+    float pitch = jam_player->getPitch();
+    qDebug() << pitch;
+    pitch -= 0.05;
+    jam_player->setPitch(pitch);
+
+    QListWidgetItem *curr = songList->currentItem();
+
+    QJsonObject details {{"name", curr->text()}, {"field", "pitch"}, {"pitch", pitch}};
+    MD->updateSong(details);
+
+}
+
+void MainWindow::pitchUp()
+{
+    float pitch = jam_player->getPitch();
+    qDebug() << pitch;
+    pitch += 0.05;
+    jam_player->setPitch(pitch);
+
+    QListWidgetItem *curr = songList->currentItem();
+
+    QJsonObject details {{"name", curr->text()}, {"field", "pitch"}, {"pitch", pitch}};
+    MD->updateSong(details);
+
+}
+
 
 void MainWindow::open()
 {
@@ -219,12 +250,14 @@ void MainWindow::onPositionChanged()
 }
 
 
-void MainWindow::openFile(const QString & fileName)
+void MainWindow::openFile(const QString & fileName, const float pitch)
 {
     baseDir = QFileInfo(fileName).path();
 
+
     jam_player->stop();
     jam_player->setLocation(fileName);
+    jam_player->setPitch(pitch);
     jam_player->play();
 }
 

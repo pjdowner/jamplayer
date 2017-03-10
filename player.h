@@ -5,6 +5,7 @@
 #include <QTime>
 #include <QGst/Pipeline>
 #include <QGst/Ui/VideoWidget>
+#include "music.h"
 
 class Player : public QObject
 {
@@ -18,6 +19,8 @@ public:
     QString currentFile;
     QTime position() const;
     QTime length() const;
+    void setPitch(float) const;
+    float getPitch() const;
     QGst::State state() const;
 
 public Q_SLOTS:
@@ -32,6 +35,7 @@ Q_SIGNALS:
     void stateChanged();
 
 private:
+
     QGst::PipelinePtr jam_pipeline;
     void busMessageRecv(const QGst::MessagePtr & message);
     void stateChange(const QGst::StateChangedMessagePtr & playerState);

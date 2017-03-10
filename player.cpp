@@ -65,6 +65,30 @@ QGst::State Player::state() const
     return jam_pipeline ? jam_pipeline->currentState() : QGst::StateNull;
 }
 
+float Player::getPitch() const
+{
+    QGst::ElementPtr t = jam_pipeline->getElementByName("t");
+
+    qDebug() << t->property("pitch");
+
+    QGlib::Value p = t->property("pitch");
+    float f;
+
+    bool ok;
+    f = p.get<float>(&ok);
+
+    return f;
+}
+
+void Player::setPitch(float p) const
+{
+
+    QGst::ElementPtr t = jam_pipeline->getElementByName("t");
+    t->setProperty("pitch", p);
+
+}
+
+
 QTime Player::length() const
 {
     if (jam_pipeline) {
@@ -186,6 +210,9 @@ void Player::pitchDown()
 
 
     f = f - 0.05;
+
+
+
     t->setProperty("pitch", f);
 }
 
