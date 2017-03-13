@@ -143,6 +143,12 @@ void MainWindow::createUI(QBoxLayout *appLayout)
     pitchUpButton = initButton(QStyle::SP_ArrowUp, tr("Pitch Up"),
                               this, SLOT(pitchUp()), btnLayout);
 
+    slowDownButton = initButton(QStyle::SP_ArrowDown, tr("Slow Down"),
+                                this, SLOT(slowDown()), btnLayout);
+
+    speedUpButton = initButton(QStyle::SP_ArrowUp, tr("Speed Up"),
+                               this, SLOT(speedUp()), btnLayout);
+
     btnLayout->addStretch();
 
     appLayout->addLayout(btnLayout);
@@ -157,8 +163,9 @@ void MainWindow::loadFile()
     QString loc = MD->getLocation(curr->text());
 
     float p = MD->getPitch(curr->text());
+    float t = MD->getTempo(curr->text());
 
-    openFile(loc, p);
+    openFile(loc, p, t);
 }
 
 void MainWindow::pitchDown()
@@ -189,6 +196,31 @@ void MainWindow::pitchUp()
 
 }
 
+void MainWindow::slowDown()
+{
+
+    float tempo = jam_player->getTempo();
+    tempo -= 0.05;
+    jam_player->setTempo(tempo);
+
+    QListWidgetItem *curr = songList->currentItem();
+
+    QJsonObject details {{"name", curr->text()}, {"field", "tempo"}, {"tempo", tempo}};
+    MD->updateSong(details);
+
+}
+
+void MainWindow::speedUp()
+{
+    float tempo = jam_player->getTempo();
+    tempo += 0.05;
+    jam_player->setTempo(tempo);
+
+    QListWidgetItem *curr = songList->currentItem();
+
+    QJsonObject details {{"name", curr->text()}, {"field", "tempo"}, {"tempo", tempo}};
+    MD->updateSong(details);
+}
 
 void MainWindow::open()
 {
@@ -250,7 +282,7 @@ void MainWindow::onPositionChanged()
 }
 
 
-void MainWindow::openFile(const QString & fileName, const float pitch)
+void MainWindow::openFile(const QString & fileName, const float pitch, const float tempo)
 {
     baseDir = QFileInfo(fileName).path();
 
@@ -258,6 +290,7 @@ void MainWindow::openFile(const QString & fileName, const float pitch)
     jam_player->stop();
     jam_player->setLocation(fileName);
     jam_player->setPitch(pitch);
+    jam_player->setTempo(tempo);
     jam_player->play();
 }
 

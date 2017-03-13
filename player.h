@@ -22,6 +22,8 @@ public:
     void setPitch(float) const;
     float getPitch() const;
     QGst::State state() const;
+    void setTempo(float tempo);
+    float getTempo(void);
 
 public Q_SLOTS:
     void stop();

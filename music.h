@@ -20,6 +20,7 @@ public:
     QJsonArray loadData();
     QString getLocation(QString name);
     float getPitch(QString name);
+    float getTempo(QString name);
     void addSong(QJsonObject song);
     void updateSong(QJsonObject details);
 

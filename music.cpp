@@ -12,6 +12,22 @@ Music::~Music()
 
 }
 
+float Music::getTempo(QString name){
+    qDebug() << "search: " << name;
+
+    for (int i =0; i < ja.size(); i++) {
+        if (ja[i].isObject()) {
+            QJsonObject jo = ja[i].toObject();
+            if (QString::compare( jo.value("name").toString(), name, Qt::CaseInsensitive) == 0){
+                qDebug() << "getpitch " << jo.value("tempo");
+
+                return jo.value("tempo").toDouble();
+            }
+        }
+    }
+    return(1.0);
+}
+
 float Music::getPitch(QString name){
     qDebug() << "search: " << name;
 

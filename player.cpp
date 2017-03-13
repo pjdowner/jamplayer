@@ -252,3 +252,52 @@ void Player::stateChange(const QGst::StateChangedMessagePtr & playerState)
 }
 
 
+void Player::setTempo(float tempo)
+{
+    if (jam_pipeline) {
+
+        qDebug() << jam_pipeline->listProperties();
+        //m_pipeline->setProperty("tempo", tempo);
+        QGst::ElementPtr t = jam_pipeline->getElementByName("t");
+
+        QList<QGlib::ParamSpecPtr> ptr;
+
+        ptr = t->listProperties();
+
+        for (int i = 0; i < ptr.size(); ++i) {
+            qDebug()<<ptr.at(i)->name();
+
+        }
+
+        QGlib::ParamSpecPtr p = t->findProperty("tempo");
+
+        qDebug() << t->property("tempo");
+
+        //ptr t->listProperties();
+        t->setProperty("tempo", tempo);
+
+    }
+}
+
+float Player::getTempo(void)
+{
+    if (jam_pipeline) {
+
+        qDebug() <<jam_pipeline->listProperties();
+
+        QGst::ElementPtr t = jam_pipeline->getElementByName("t");
+
+        QGlib::Value tempo = t->property("tempo");
+
+        qDebug() << tempo;
+
+        float f;
+        bool ok;
+        f = tempo.get<float>(&ok);
+
+        return f;
+
+    }
+    return 0;
+}
+

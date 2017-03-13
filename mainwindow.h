@@ -31,11 +31,13 @@ public:
 private Q_SLOTS:
     void open();
     void loadFile();
-    void openFile(const QString & fileName, const float pitch);
+    void openFile(const QString & fileName, const float pitch, const float tempo);
     void onStateChanged();
     void onPositionChanged();
     void pitchDown();
     void pitchUp();
+    void slowDown();
+    void speedUp();
 
 private:
     Player *jam_player;
@@ -60,6 +62,9 @@ private:
     QToolButton *stopButton;
     QToolButton *pitchUpButton;
     QToolButton *pitchDownButton;
+    QToolButton *slowDownButton;
+    QToolButton *speedUpButton;
+
 };
 
 #endif // MAINWINDOW_H
