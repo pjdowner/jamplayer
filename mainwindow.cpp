@@ -107,6 +107,14 @@ void MainWindow::createUI(QBoxLayout *appLayout)
     positionSlider->setTickInterval(10);
     positionSlider->setMaximum(1000);
 
+    pitchLabel = new QLabel();
+    pitchLabel->setFont(f);
+    pitchLabel->setText("Pitch:");
+
+    tempoLabel = new QLabel();
+    tempoLabel->setFont(f);
+    tempoLabel->setText("Tempo:");
+
     connect(jam_player, SIGNAL(positionChanged()), this, SLOT(onPositionChanged()));
     connect(positionSlider, SIGNAL(sliderMoved(int)), this, SLOT(setPosition(int)));
 
@@ -123,6 +131,8 @@ void MainWindow::createUI(QBoxLayout *appLayout)
     posLayout->addWidget(songList, 1,1,1,2, Qt::AlignCenter);
     posLayout->addWidget(positionSlider, 2, 1, 1, 2, Qt::AlignVCenter);
     posLayout->addWidget(positionLabel, 3, 1, 1, 2, Qt::AlignHCenter|Qt::AlignTop);
+    posLayout->addWidget(tempoLabel, 4,1,1,1, Qt::AlignCenter);
+    posLayout->addWidget(pitchLabel, 4,2,1,1, Qt::AlignCenter);
     appLayout->addLayout(posLayout);
 
     openButton = initButton(QStyle::SP_DialogOpenButton, tr("Open File"),
@@ -174,6 +184,7 @@ void MainWindow::pitchDown()
     qDebug() << pitch;
     pitch -= 0.05;
     jam_player->setPitch(pitch);
+    updatePitchLabel(pitch);
 
     QListWidgetItem *curr = songList->currentItem();
 
@@ -188,7 +199,7 @@ void MainWindow::pitchUp()
     qDebug() << pitch;
     pitch += 0.05;
     jam_player->setPitch(pitch);
-
+    updatePitchLabel(pitch);
     QListWidgetItem *curr = songList->currentItem();
 
     QJsonObject details {{"name", curr->text()}, {"field", "pitch"}, {"pitch", pitch}};
@@ -202,7 +213,7 @@ void MainWindow::slowDown()
     float tempo = jam_player->getTempo();
     tempo -= 0.05;
     jam_player->setTempo(tempo);
-
+    updateTempoLabel(tempo);
     QListWidgetItem *curr = songList->currentItem();
 
     QJsonObject details {{"name", curr->text()}, {"field", "tempo"}, {"tempo", tempo}};
@@ -215,6 +226,7 @@ void MainWindow::speedUp()
     float tempo = jam_player->getTempo();
     tempo += 0.05;
     jam_player->setTempo(tempo);
+    updateTempoLabel(tempo);
 
     QListWidgetItem *curr = songList->currentItem();
 
@@ -238,7 +250,7 @@ void MainWindow::open()
         QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
                                                  "Please Enter a name for " + fileName, QLineEdit::Normal, title
                                                  , &ok);
-        QJsonObject song {{"name", text}, {"location", fileName}};
+        QJsonObject song {{"name", text}, {"location", fileName}, {"pitch", 1.0}, {"tempo", 1.0}};
 
         MD->addSong(song);
 
@@ -281,6 +293,17 @@ void MainWindow::onPositionChanged()
     }
 }
 
+void MainWindow::updatePitchLabel(float pitch)
+{
+    QVariant p = qRound(pitch * 100);
+    pitchLabel->setText("Pitch: " + p.toString() + "%");
+}
+
+void MainWindow::updateTempoLabel(float tempo)
+{
+    QVariant t = qRound(tempo * 100);
+    tempoLabel->setText("Tempo: " + t.toString() + "%");
+}
 
 void MainWindow::openFile(const QString & fileName, const float pitch, const float tempo)
 {
@@ -292,6 +315,9 @@ void MainWindow::openFile(const QString & fileName, const float pitch, const flo
     jam_player->setPitch(pitch);
     jam_player->setTempo(tempo);
     jam_player->play();
+
+    updatePitchLabel(pitch);
+    updateTempoLabel(tempo);
 }
 
 

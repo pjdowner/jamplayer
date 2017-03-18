@@ -50,10 +50,15 @@ private:
     void readJson(QJsonObject &json);
     void updateList(QJsonArray);
 
+    void updatePitchLabel(float pitch);
+    void updateTempoLabel(float tempo);
 
 
     QSlider *positionSlider;
     QLabel *positionLabel;
+
+    QLabel *pitchLabel;
+    QLabel *tempoLabel;
 
     QString baseDir;
     QToolButton *openButton;
