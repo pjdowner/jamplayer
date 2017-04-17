@@ -28,6 +28,7 @@
 #include <QGst/Message>
 #include <QGst/ClockTime>
 #include <QGst/Query>
+#include <QGst/Event>
 /*
 #include "player.h"
 #include <QDir>
@@ -115,6 +116,17 @@ QTime Player::position() const
     }
 }
 
+void Player::setPosition(const QTime & pos)
+{
+    QGst::SeekEventPtr evt = QGst::SeekEvent::create(
+        1.0, QGst::FormatTime, QGst::SeekFlagFlush,
+        QGst::SeekTypeSet, QGst::ClockTime::fromTime(pos),
+        QGst::SeekTypeNone, QGst::ClockTime::None
+    );
+
+    jam_pipeline->sendEvent(evt);
+}
+
 void Player::setLocation(const QString & location)
 {
 
@@ -124,6 +136,7 @@ void Player::setLocation(const QString & location)
                                         "decodebin ! "
                                         "audioconvert ! "
                                         "pitch name=t tempo=1.0 ! "
+                                        "audiopanorama panorama=-1.00 ! "
                                         "autoaudiosink "
                                         ).arg(location);
 

@@ -14,11 +14,13 @@ LIBS += -lQt5GStreamer-1.0 -lQt5GStreamerUi-1.0 -lQt5GLib-2.0
 SOURCES += main.cpp\
         mainwindow.cpp\
         player.cpp \
-    music.cpp
+    music.cpp \
+    midicontrol.cpp
 
 
 HEADERS  += mainwindow.h \
         player.h \
-    music.h
+    music.h \
+    midicontrol.h
 
 

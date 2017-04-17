@@ -19,6 +19,7 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "midicontrol.h"
 #include "mainwindow.h"
 #include <QBoxLayout>
 #include <QToolButton>
@@ -93,6 +94,25 @@ void MainWindow::updateList(QJsonArray ja)
 
 void MainWindow::createUI(QBoxLayout *appLayout)
 {
+    const QString errorstr = "Fatal error from the ALSA sequencer. "
+            "This usually happens when the kernel doesn't have ALSA support, "
+            "or the device node (/dev/snd/seq) doesn't exists, "
+            "or the kernel module (snd_seq) is not loaded. "
+            "Please check your ALSA/MIDI configuration.";
+    try {
+        mControl = new midicontrol(this);
+
+        QVariant portName = "20:0";
+        mControl->subscribe(portName.toString());
+        mControl->run();
+    }
+    catch (const SequencerError& ex) {
+        qDebug() << errorstr + " Returned error was: " + ex.qstrError() << endl;
+    } catch (...) {
+        qDebug() << errorstr << endl;
+    }
+
+
     baseDir = QLatin1String(".");
     QHBoxLayout *btnLayout = new QHBoxLayout;
     btnLayout->addStretch();
@@ -117,6 +137,7 @@ void MainWindow::createUI(QBoxLayout *appLayout)
 
     connect(jam_player, SIGNAL(positionChanged()), this, SLOT(onPositionChanged()));
     connect(positionSlider, SIGNAL(sliderMoved(int)), this, SLOT(setPosition(int)));
+    connect(mControl, SIGNAL(keyPressed(int)), this, SLOT(keyed(int)));
 
     songList = new QListWidget(this);
 
@@ -166,6 +187,26 @@ void MainWindow::createUI(QBoxLayout *appLayout)
 
 }
 
+void MainWindow::keyed(int k)
+{
+    qDebug() << "do something!";
+    if (k == 1) {
+        slowDown();
+
+    } else if (k == 2) {
+        speedUp();
+
+    } else if (k == 3) {
+        QTime t = jam_player->position();
+        qDebug() << t;
+        t = t.addSecs(-10);
+        qDebug() << t;
+        jam_player->setPosition(t);
+
+    }
+
+}
+
 void MainWindow::loadFile()
 {
     QListWidgetItem *curr = songList->currentItem();
@@ -174,6 +215,8 @@ void MainWindow::loadFile()
 
     float p = MD->getPitch(curr->text());
     float t = MD->getTempo(curr->text());
+
+    sleep(5);
 
     openFile(loc, p, t);
 }
@@ -269,6 +312,8 @@ void MainWindow::onPositionChanged()
 {
     QTime length(0,0);
     QTime curpos(0,0);
+    const QTime loop(0,1,0);
+    const QTime target(0,0,50);
 
     if (jam_player->state() != QGst::StateReady &&
         jam_player->state() != QGst::StateNull)
@@ -276,6 +321,14 @@ void MainWindow::onPositionChanged()
         length = jam_player->length();
         curpos = jam_player->position();
     }
+
+    /*
+    qDebug() << curpos << " : " << loop << " : " << target;
+    if (curpos >= loop) {
+        qDebug() << "meep";
+        jam_player->setPosition(target);
+    }
+    */
 
     positionLabel->setText(curpos.toString("hh:mm:ss.zzz")
                                         + "/" +
