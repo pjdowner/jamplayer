@@ -48,6 +48,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     QListWidget *songList;
+    QListWidget *loopList;
 
 private Q_SLOTS:
     void open();
@@ -73,7 +74,8 @@ private:
 
     bool loadData();
     void readJson(QJsonObject &json);
-    void updateList(QJsonArray);
+    void updateList(QJsonArray ja);
+    void updateLoopList(QJsonArray loops);
 
     void updatePitchLabel(float pitch);
     void updateTempoLabel(float tempo);

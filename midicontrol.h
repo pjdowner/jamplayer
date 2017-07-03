@@ -56,6 +56,9 @@ public:
 
 public slots:
     void subscription(MidiPort* port, Subscription* subs);
+    QStringList inputConnections();
+    QStringList outputConnections();
+
 
 #ifdef USE_QEVENTS
 protected:
@@ -75,6 +78,7 @@ private:
     MidiPort* m_Port;
     MidiQueue* m_Queue;
 
+    QStringList list_ports(PortInfoList& refs);
 
 };
 

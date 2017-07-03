@@ -184,6 +184,28 @@ void midicontrol::run()
 
 }
 
+QStringList midicontrol::inputConnections()
+{
+    PortInfoList inputs(m_Client->getAvailableInputs());
+    return list_ports(inputs);
+}
+
+QStringList midicontrol::outputConnections()
+{
+    PortInfoList outputs(m_Client->getAvailableOutputs());
+    return list_ports(outputs);
+}
+
+QStringList midicontrol::list_ports(PortInfoList& refs)
+{
+    QStringList lst;
+    foreach(PortInfo p, refs) {
+        lst += QString("%1:%2").arg(p.getClientName()).arg(p.getPort());
+        qDebug() << QString("%1:%2").arg(p.getClientName()).arg(p.getPort());
+    }
+    return lst;
+}
+
 
 void midicontrol::subscribe(const QString& portName)
 {

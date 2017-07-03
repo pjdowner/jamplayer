@@ -79,6 +79,20 @@ void MainWindow::onStateChanged()
 
 }
 
+void MainWindow::updateLoopList(QJsonArray loops)
+{
+    loopList->clear();
+
+    for (int i=0; i < loops.size(); i++) {
+        if (loops[i].isObject()) {
+            QJsonObject section = loops[i].toObject();
+            qDebug() << section.value("name").toString();
+            new QListWidgetItem(section.value("name").toString(), loopList);
+        }
+    }
+
+}
+
 void MainWindow::updateList(QJsonArray ja)
 {
     songList->clear();
@@ -87,6 +101,9 @@ void MainWindow::updateList(QJsonArray ja)
             QJsonObject jo = ja[i].toObject();
             qDebug() << jo.value("name").toString();
             new QListWidgetItem(jo.value("name").toString(), songList );
+            if (jo.value("loops").isArray()){
+                updateLoopList(jo.value("loops").toArray());
+            }
         }
     }
 
@@ -102,8 +119,9 @@ void MainWindow::createUI(QBoxLayout *appLayout)
     try {
         mControl = new midicontrol(this);
 
-        QVariant portName = "20:0";
-        mControl->subscribe(portName.toString());
+        QString portName = "FBV Express Mk II:0";
+        mControl->subscribe(portName);
+        QStringList devices = mControl->inputConnections();
         mControl->run();
     }
     catch (const SequencerError& ex) {
@@ -140,6 +158,7 @@ void MainWindow::createUI(QBoxLayout *appLayout)
     connect(mControl, SIGNAL(keyPressed(int)), this, SLOT(keyed(int)));
 
     songList = new QListWidget(this);
+    loopList = new QListWidget(this);
 
     QJsonArray ja = MD->loadData();
     if ( ja.size() < 1) {
@@ -147,9 +166,15 @@ void MainWindow::createUI(QBoxLayout *appLayout)
     }
     updateList(ja);
 
+
+
+
+
     QGridLayout *posLayout = new QGridLayout;
     posLayout->setContentsMargins(50,50,50,50);
-    posLayout->addWidget(songList, 1,1,1,2, Qt::AlignCenter);
+    posLayout->addWidget(songList, 1,1,1,2, Qt::AlignLeft);
+    posLayout->addWidget(loopList,1,1,1,2, Qt::AlignRight);
+
     posLayout->addWidget(positionSlider, 2, 1, 1, 2, Qt::AlignVCenter);
     posLayout->addWidget(positionLabel, 3, 1, 1, 2, Qt::AlignHCenter|Qt::AlignTop);
     posLayout->addWidget(tempoLabel, 4,1,1,1, Qt::AlignCenter);
