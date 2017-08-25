@@ -83,6 +83,9 @@ void MainWindow::updateLoopList(QJsonArray loops)
 {
     loopList->clear();
 
+    QListWidgetItem *all = new QListWidgetItem("All", loopList);
+    loopList->setCurrentItem(all);
+
     for (int i=0; i < loops.size(); i++) {
         if (loops[i].isObject()) {
             QJsonObject section = loops[i].toObject();
@@ -90,7 +93,6 @@ void MainWindow::updateLoopList(QJsonArray loops)
             new QListWidgetItem(section.value("name").toString(), loopList);
         }
     }
-
 }
 
 void MainWindow::updateList(QJsonArray ja)
@@ -241,8 +243,6 @@ void MainWindow::loadFile()
     float p = MD->getPitch(curr->text());
     float t = MD->getTempo(curr->text());
 
-    sleep(5);
-
     openFile(loc, p, t);
 }
 
@@ -392,10 +392,18 @@ void MainWindow::openFile(const QString & fileName, const float pitch, const flo
     jam_player->setLocation(fileName);
     jam_player->setPitch(pitch);
     jam_player->setTempo(tempo);
-    jam_player->play();
 
     updatePitchLabel(pitch);
     updateTempoLabel(tempo);
+
+    QTimer::singleShot(5000, this, SLOT(play()));
+
+    //jam_player->play();
+}
+
+void MainWindow::play()
+{
+    jam_player->play();
 }
 
 

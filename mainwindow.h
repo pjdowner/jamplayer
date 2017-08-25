@@ -61,6 +61,7 @@ private Q_SLOTS:
     void slowDown();
     void speedUp();
     void keyed(int k);
+    void play(void);
 
 private:
     Player *jam_player;
