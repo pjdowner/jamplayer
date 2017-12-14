@@ -193,10 +193,12 @@ void Player::stop()
 void Player::play()
 {
     if (!jam_pipeline) {
+        qDebug() << "no pipeline";
         setLocation(currentFile);
     }
 
     if (jam_pipeline) {
+        qDebug() << "setState playing";
         jam_pipeline->setState(QGst::StatePlaying);
     }
 }
@@ -204,7 +206,11 @@ void Player::play()
 void Player::pause()
 {
     if (jam_pipeline) {
-        jam_pipeline->setState(QGst::StatePaused);
+        if (state() == QGst::StatePaused) {
+                jam_pipeline->setState(QGst::StatePlaying);
+        } else {
+                jam_pipeline->setState(QGst::StatePaused);
+        }
     }
 }
 
@@ -313,4 +319,6 @@ float Player::getTempo(void)
     }
     return 0;
 }
+
+
 

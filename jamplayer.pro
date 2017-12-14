@@ -8,6 +8,7 @@ PKGCONFIG += alsa drumstick-alsa
 CONFIG += link_pkgconfig
 
 INCLUDEPATH += /usr/include/Qt5GStreamer/
+INCLUDEPATH += /usr/include/drumstick/
 
 LIBS += -lQt5GStreamer-1.0 -lQt5GStreamerUi-1.0 -lQt5GLib-2.0
 

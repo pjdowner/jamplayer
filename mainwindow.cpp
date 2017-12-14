@@ -243,7 +243,11 @@ void MainWindow::loadFile()
     float p = MD->getPitch(curr->text());
     float t = MD->getTempo(curr->text());
 
-    openFile(loc, p, t);
+    if (jam_player->state() == QGst::StatePaused) {
+            jam_player->play();
+    } else {
+        openFile(loc, p, t);
+    }
 }
 
 void MainWindow::pitchDown()
