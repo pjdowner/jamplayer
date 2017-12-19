@@ -62,6 +62,9 @@ private Q_SLOTS:
     void speedUp();
     void keyed(int k);
     void play(void);
+    void onDurationChanged();
+    void getTimeStart();
+    void getTimeStop();
 
 private:
     Player *jam_player;
@@ -70,6 +73,8 @@ private:
                                       QObject *dstobj, const char *slot_method, QLayout *layout);
 
     midicontrol* mControl;
+
+    void getTime(bool start);
 
     void createUI(QBoxLayout *appLayout);
 
@@ -97,6 +102,20 @@ private:
     QToolButton *pitchDownButton;
     QToolButton *slowDownButton;
     QToolButton *speedUpButton;
+
+    QToolButton *start_backicon;
+    QToolButton *start_forwardicon;
+    QToolButton *start_gettime;
+
+    QToolButton *stop_backicon;
+    QToolButton *stop_forwardicon;
+    QToolButton *stop_gettime;
+
+    QLabel *loopStart;
+    QLabel *loopStop;
+
+    QTime startTime;
+    QTime stopTime;
 
 };
 

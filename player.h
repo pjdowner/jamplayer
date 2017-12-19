@@ -56,6 +56,7 @@ public Q_SLOTS:
 Q_SIGNALS:
     void positionChanged();
     void stateChanged();
+    void durationChanged();
 
 private:
 

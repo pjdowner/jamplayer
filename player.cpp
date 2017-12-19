@@ -164,6 +164,9 @@ void Player::setLocation(const QString & location)
 void Player::busMessageRecv(const QGst::MessagePtr & message)
 {
     switch (message->type()) {
+    case QGst::MessageDurationChanged:
+        Q_EMIT durationChanged();
+        break;
     case QGst::MessageEos:
         stop();
         break;

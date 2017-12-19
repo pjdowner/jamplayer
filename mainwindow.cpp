@@ -35,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     jam_player = new Player(this);
     connect(jam_player, SIGNAL(stateChanged()), this, SLOT(onStateChanged()));
+    connect(jam_player, SIGNAL(durationChanged()), this, SLOT(onDurationChanged()));
 
     MD = new Music(this);
 
@@ -132,6 +133,13 @@ void MainWindow::createUI(QBoxLayout *appLayout)
         qDebug() << errorstr << endl;
     }
 
+    startTime = QTime(0,0);
+    stopTime = QTime(0,0);
+
+    QGridLayout *looper = new QGridLayout;
+    QHBoxLayout *loopcontrol1 = new QHBoxLayout;
+    QHBoxLayout *loopcontrol2 = new QHBoxLayout;
+
 
     baseDir = QLatin1String(".");
     QHBoxLayout *btnLayout = new QHBoxLayout;
@@ -168,17 +176,36 @@ void MainWindow::createUI(QBoxLayout *appLayout)
     }
     updateList(ja);
 
+    loopStart = new QLabel();
+    loopStart->setFont(f);
+    loopStart->setText("00:00:00.000");
+    looper->addWidget(loopStart,1,1,1,1,Qt::AlignCenter);
 
+    loopStop = new QLabel();
+    loopStop->setFont(f);
+    loopStop->setText("00:00:00.000");
+    looper->addWidget(loopStop,1,2,1,1,Qt::AlignCenter);
+
+    start_backicon = initButton(QStyle::SP_MediaSeekBackward, tr("Back"), this, SLOT(timeback()), loopcontrol1);
+    start_gettime = initButton(QStyle::SP_DialogApplyButton, tr("Get Time"), this, SLOT(getTimeStart()), loopcontrol1);
+    start_forwardicon = initButton(QStyle::SP_MediaSeekForward, tr("Forward"), this, SLOT(timeforward()), loopcontrol1);
+    stop_backicon = initButton(QStyle::SP_MediaSeekBackward, tr("Back"), this, SLOT(timeback()), loopcontrol2);
+    stop_gettime = initButton(QStyle::SP_DialogApplyButton, tr("Get Time"), this, SLOT(getTimeStop()), loopcontrol2);
+    stop_forwardicon = initButton(QStyle::SP_MediaSeekForward, tr("Forward"), this, SLOT(timeforward()), loopcontrol2);
+
+    looper->addLayout(loopcontrol1,2,1,1,1,Qt::AlignCenter);
+    looper->addLayout(loopcontrol2, 2,2,1,1,Qt::AlignCenter);
 
 
 
     QGridLayout *posLayout = new QGridLayout;
     posLayout->setContentsMargins(50,50,50,50);
-    posLayout->addWidget(songList, 1,1,1,2, Qt::AlignLeft);
-    posLayout->addWidget(loopList,1,1,1,2, Qt::AlignRight);
+    posLayout->addWidget(songList, 1,1,1,1, Qt::AlignLeft);
+    posLayout->addLayout(looper,1,2,1,1, Qt::AlignCenter);
+    posLayout->addWidget(loopList,1,3,1,1, Qt::AlignRight);
 
-    posLayout->addWidget(positionSlider, 2, 1, 1, 2, Qt::AlignVCenter);
-    posLayout->addWidget(positionLabel, 3, 1, 1, 2, Qt::AlignHCenter|Qt::AlignTop);
+    posLayout->addWidget(positionSlider, 2, 1, 1, 3, Qt::AlignVCenter);
+    posLayout->addWidget(positionLabel, 3, 1, 1, 3, Qt::AlignHCenter|Qt::AlignTop);
     posLayout->addWidget(tempoLabel, 4,1,1,1, Qt::AlignCenter);
     posLayout->addWidget(pitchLabel, 4,2,1,1, Qt::AlignCenter);
     appLayout->addLayout(posLayout);
@@ -306,6 +333,33 @@ void MainWindow::speedUp()
     MD->updateSong(details);
 }
 
+void MainWindow::getTimeStart()
+{
+    getTime(true);
+}
+
+void MainWindow::getTimeStop()
+{
+    getTime(false);
+}
+
+void MainWindow::getTime(bool start)
+{
+    QTime pos(0,0);
+    if (jam_player->state() != QGst::StateReady &&
+        jam_player->state() != QGst::StateNull)
+    {
+        pos = jam_player->position();
+        if (start) {
+            loopStart->setText(pos.toString("hh:mm:ss.zzz"));
+            startTime = pos;
+        } else {
+            loopStop->setText(pos.toString("hh:mm:ss.zzz"));
+            stopTime = pos;
+        }
+    }
+}
+
 void MainWindow::open()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Load a song"), baseDir);
@@ -336,6 +390,18 @@ void MainWindow::open()
     }
 }
 
+/* Called when the duration of a song changes */
+void MainWindow::onDurationChanged()
+{
+    QTime length(0,0);
+    if (jam_player->state() != QGst::StateReady &&
+        jam_player->state() != QGst::StateNull)
+    {
+        length = jam_player->length();
+    }
+    loopStop->setText(length.toString("hh:mm:ss.zzz"));
+}
+
 /* Called when the positionChanged() is received from the player */
 void MainWindow::onPositionChanged()
 {
@@ -351,13 +417,13 @@ void MainWindow::onPositionChanged()
         curpos = jam_player->position();
     }
 
-    /*
-    qDebug() << curpos << " : " << loop << " : " << target;
-    if (curpos >= loop) {
+
+    //qDebug() << curpos << " : " << loop << " : " << target;
+    if ((stopTime > QTime(0,0)) && (curpos >= stopTime)) {
         qDebug() << "meep";
-        jam_player->setPosition(target);
+        jam_player->setPosition(startTime);
     }
-    */
+
 
     positionLabel->setText(curpos.toString("hh:mm:ss.zzz")
                                         + "/" +
