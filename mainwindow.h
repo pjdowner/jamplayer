@@ -65,6 +65,11 @@ private Q_SLOTS:
     void onDurationChanged();
     void getTimeStart();
     void getTimeStop();
+    void timestop_back();
+    void timestop_forward();
+    void timestart_back();
+    void timestart_forward();
+    void timechange(QTime *time, QLabel *lbl, bool forward);
 
 private:
     Player *jam_player;

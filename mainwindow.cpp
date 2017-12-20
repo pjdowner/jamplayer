@@ -186,12 +186,12 @@ void MainWindow::createUI(QBoxLayout *appLayout)
     loopStop->setText("00:00:00.000");
     looper->addWidget(loopStop,1,2,1,1,Qt::AlignCenter);
 
-    start_backicon = initButton(QStyle::SP_MediaSeekBackward, tr("Back"), this, SLOT(timeback()), loopcontrol1);
+    start_backicon = initButton(QStyle::SP_MediaSeekBackward, tr("Back"), this, SLOT(timestart_back()), loopcontrol1);
     start_gettime = initButton(QStyle::SP_DialogApplyButton, tr("Get Time"), this, SLOT(getTimeStart()), loopcontrol1);
-    start_forwardicon = initButton(QStyle::SP_MediaSeekForward, tr("Forward"), this, SLOT(timeforward()), loopcontrol1);
-    stop_backicon = initButton(QStyle::SP_MediaSeekBackward, tr("Back"), this, SLOT(timeback()), loopcontrol2);
+    start_forwardicon = initButton(QStyle::SP_MediaSeekForward, tr("Forward"), this, SLOT(timestart_forward()), loopcontrol1);
+    stop_backicon = initButton(QStyle::SP_MediaSeekBackward, tr("Back"), this, SLOT(timestop_back()), loopcontrol2);
     stop_gettime = initButton(QStyle::SP_DialogApplyButton, tr("Get Time"), this, SLOT(getTimeStop()), loopcontrol2);
-    stop_forwardicon = initButton(QStyle::SP_MediaSeekForward, tr("Forward"), this, SLOT(timeforward()), loopcontrol2);
+    stop_forwardicon = initButton(QStyle::SP_MediaSeekForward, tr("Forward"), this, SLOT(timestop_forward()), loopcontrol2);
 
     looper->addLayout(loopcontrol1,2,1,1,1,Qt::AlignCenter);
     looper->addLayout(loopcontrol2, 2,2,1,1,Qt::AlignCenter);
@@ -238,6 +238,38 @@ void MainWindow::createUI(QBoxLayout *appLayout)
 
     appLayout->addLayout(btnLayout);
 
+
+}
+
+void MainWindow::timestart_back()
+{
+    timechange(&startTime, loopStart, false);
+}
+
+void MainWindow::timestart_forward()
+{
+    timechange(&startTime, loopStart, true);
+}
+
+void MainWindow::timestop_back()
+{
+    timechange(&stopTime, loopStop, false);
+}
+
+void MainWindow::timestop_forward()
+{
+    timechange(&stopTime, loopStop, true);
+}
+
+void MainWindow::timechange(QTime *time, QLabel *lbl, bool forward)
+{
+    if (forward) {
+        *time = time->addMSecs(10);
+    } else {
+        *time = time->addMSecs(-10);
+    }
+
+    lbl->setText(time->toString("hh:mm:ss:zzz"));
 
 }
 
@@ -420,7 +452,7 @@ void MainWindow::onPositionChanged()
 
     //qDebug() << curpos << " : " << loop << " : " << target;
     if ((stopTime > QTime(0,0)) && (curpos >= stopTime)) {
-        qDebug() << "meep";
+        //qDebug() << "meep";
         jam_player->setPosition(startTime);
     }
 
