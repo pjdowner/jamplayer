@@ -80,22 +80,6 @@ void MainWindow::onStateChanged()
 
 }
 
-void MainWindow::updateLoopList(QJsonArray loops)
-{
-    loopList->clear();
-
-    QListWidgetItem *all = new QListWidgetItem("All", loopList);
-    loopList->setCurrentItem(all);
-
-    for (int i=0; i < loops.size(); i++) {
-        if (loops[i].isObject()) {
-            QJsonObject section = loops[i].toObject();
-            qDebug() << section.value("name").toString();
-            new QListWidgetItem(section.value("name").toString(), loopList);
-        }
-    }
-}
-
 void MainWindow::updateList(QJsonArray ja)
 {
     songList->clear();
@@ -167,8 +151,11 @@ void MainWindow::createUI(QBoxLayout *appLayout)
     connect(positionSlider, SIGNAL(sliderMoved(int)), this, SLOT(setPosition(int)));
     connect(mControl, SIGNAL(keyPressed(int)), this, SLOT(keyed(int)));
 
+
     songList = new QListWidget(this);
     loopList = new QListWidget(this);
+
+    connect(songList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(onSongChanged()));
 
     QJsonArray ja = MD->loadData();
     if ( ja.size() < 1) {
@@ -238,6 +225,20 @@ void MainWindow::createUI(QBoxLayout *appLayout)
 
     appLayout->addLayout(btnLayout);
 
+
+}
+
+void MainWindow::onSongChanged()
+{
+    QListWidgetItem *curr = songList->currentItem();
+
+    QJsonArray l = MD->getLoops(curr->text());
+
+    if ( !l.isEmpty()) {
+      updateLoopList(l);
+    } else {
+        loopList->clear();
+    }
 
 }
 
@@ -485,6 +486,24 @@ void MainWindow::updateTempoLabel(float tempo)
     tempoLabel->setText("Tempo: " + t.toString() + "%");
 }
 
+void MainWindow::updateLoopList(QJsonArray loops)
+{
+
+    loopList->clear();
+
+    QListWidgetItem *all = new QListWidgetItem("All", loopList);
+    loopList->setCurrentItem(all);
+
+    for (int i=0; i < loops.size(); i++) {
+        if (loops[i].isObject()) {
+            QJsonObject section = loops[i].toObject();
+            qDebug() << section.value("name").toString();
+            new QListWidgetItem(section.value("name").toString(), loopList);
+        }
+    }
+
+}
+
 void MainWindow::openFile(const QString & fileName, const float pitch, const float tempo)
 {
     baseDir = QFileInfo(fileName).path();
@@ -507,6 +526,7 @@ void MainWindow::play()
 {
     jam_player->play();
 }
+
 
 
 MainWindow::~MainWindow()

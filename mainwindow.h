@@ -56,6 +56,7 @@ private Q_SLOTS:
     void openFile(const QString & fileName, const float pitch, const float tempo);
     void onStateChanged();
     void onPositionChanged();
+    void onSongChanged();
     void pitchDown();
     void pitchUp();
     void slowDown();

@@ -35,6 +35,7 @@ public:
     ~Music();
 
     QJsonArray loadData();
+    QJsonArray getLoops(QString name);
     QString getLocation(QString name);
     float getPitch(QString name);
     float getTempo(QString name);
