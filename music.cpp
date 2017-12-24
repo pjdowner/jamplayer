@@ -32,7 +32,7 @@ Music::~Music()
 QJsonArray Music::getLoops(QString name)
 {
     qDebug() << "search: " << name;
-    QJsonArray a = {1,2};
+    QJsonArray a = {};
     for (int i=0; i < ja.size(); i++) {
         if (ja[i].isObject()) {
             QJsonObject jo = ja[i].toObject();

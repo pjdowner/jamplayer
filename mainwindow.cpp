@@ -124,6 +124,7 @@ void MainWindow::createUI(QBoxLayout *appLayout)
     QHBoxLayout *loopcontrol1 = new QHBoxLayout;
     QHBoxLayout *loopcontrol2 = new QHBoxLayout;
 
+    loopName = new QLineEdit;
 
     baseDir = QLatin1String(".");
     QHBoxLayout *btnLayout = new QHBoxLayout;
@@ -156,6 +157,7 @@ void MainWindow::createUI(QBoxLayout *appLayout)
     loopList = new QListWidget(this);
 
     connect(songList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(onSongChanged()));
+    connect(loopList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(onLoopChanged()));
 
     QJsonArray ja = MD->loadData();
     if ( ja.size() < 1) {
@@ -163,15 +165,23 @@ void MainWindow::createUI(QBoxLayout *appLayout)
     }
     updateList(ja);
 
+    loopName->setFixedWidth(200);
+    looper->addWidget(loopName,1,1,1,1,Qt::AlignCenter);
+
+    loopSave = new QPushButton("Save", this);
+    looper->addWidget(loopSave, 1,2,1,1,Qt::AlignLeft);
+
+    connect(loopSave, SIGNAL(clicked(bool)), this, SLOT(saveLoop()));
+
     loopStart = new QLabel();
     loopStart->setFont(f);
     loopStart->setText("00:00:00.000");
-    looper->addWidget(loopStart,1,1,1,1,Qt::AlignCenter);
+    looper->addWidget(loopStart,2,1,1,1,Qt::AlignCenter);
 
     loopStop = new QLabel();
     loopStop->setFont(f);
     loopStop->setText("00:00:00.000");
-    looper->addWidget(loopStop,1,2,1,1,Qt::AlignCenter);
+    looper->addWidget(loopStop,2,2,1,1,Qt::AlignCenter);
 
     start_backicon = initButton(QStyle::SP_MediaSeekBackward, tr("Back"), this, SLOT(timestart_back()), loopcontrol1);
     start_gettime = initButton(QStyle::SP_DialogApplyButton, tr("Get Time"), this, SLOT(getTimeStart()), loopcontrol1);
@@ -180,8 +190,8 @@ void MainWindow::createUI(QBoxLayout *appLayout)
     stop_gettime = initButton(QStyle::SP_DialogApplyButton, tr("Get Time"), this, SLOT(getTimeStop()), loopcontrol2);
     stop_forwardicon = initButton(QStyle::SP_MediaSeekForward, tr("Forward"), this, SLOT(timestop_forward()), loopcontrol2);
 
-    looper->addLayout(loopcontrol1,2,1,1,1,Qt::AlignCenter);
-    looper->addLayout(loopcontrol2, 2,2,1,1,Qt::AlignCenter);
+    looper->addLayout(loopcontrol1,3,1,1,1,Qt::AlignCenter);
+    looper->addLayout(loopcontrol2,3,2,1,1,Qt::AlignCenter);
 
 
 
@@ -224,6 +234,14 @@ void MainWindow::createUI(QBoxLayout *appLayout)
     btnLayout->addStretch();
 
     appLayout->addLayout(btnLayout);
+
+
+}
+
+void MainWindow::onLoopChanged()
+{
+    QListWidgetItem *currLoop = loopList->currentItem();
+    QJsonArray l = MD->getLoops(curr->text());
 
 
 }
@@ -391,6 +409,30 @@ void MainWindow::getTime(bool start)
             stopTime = pos;
         }
     }
+}
+
+void MainWindow::saveLoop()
+{
+    QString lname = loopName->text();
+    QListWidgetItem *curr = songList->currentItem();
+    QJsonArray loops = MD->getLoops(curr->text());
+
+    QJsonObject loop = {
+                            {"name", lname},
+                            {"start", startTime.toString("hh:mm:ss.zzz")},
+                            {"stop", stopTime.toString("hh:mm:ss.zzz")}
+                       };
+
+    loops.append(loop);
+
+    QJsonObject details {
+        {"name", curr->text()},
+        {"field", "loops"},
+        {"loops", loops}
+    };
+    MD->updateSong(details);
+    updateLoopList(loops);
+
 }
 
 void MainWindow::open()

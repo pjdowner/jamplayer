@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QSlider>
 #include <QLabel>
 #include <QListWidget>
+#include <QPushButton>
 
 class QBoxLayout;
 class QToolButton;
@@ -57,6 +58,7 @@ private Q_SLOTS:
     void onStateChanged();
     void onPositionChanged();
     void onSongChanged();
+    void onLoopChanged();
     void pitchDown();
     void pitchUp();
     void slowDown();
@@ -71,6 +73,7 @@ private Q_SLOTS:
     void timestart_back();
     void timestart_forward();
     void timechange(QTime *time, QLabel *lbl, bool forward);
+    void saveLoop();
 
 private:
     Player *jam_player;
@@ -122,6 +125,9 @@ private:
 
     QTime startTime;
     QTime stopTime;
+
+    QLineEdit *loopName;
+    QPushButton *loopSave;
 
 };
 
