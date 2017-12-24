@@ -74,6 +74,8 @@ private Q_SLOTS:
     void timestart_forward();
     void timechange(QTime *time, QLabel *lbl, bool forward);
     void saveLoop();
+    bool loopMode();
+    void checkLoopStatus();
 
 private:
     Player *jam_player;

@@ -36,6 +36,7 @@ public:
 
     QJsonArray loadData();
     QJsonArray getLoops(QString name);
+    QJsonObject getLoop(QString sName, QString lName);
     QString getLocation(QString name);
     float getPitch(QString name);
     float getTempo(QString name);

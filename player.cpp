@@ -259,6 +259,8 @@ void Player::stateChange(const QGst::StateChangedMessagePtr & playerState)
 {
     switch (playerState->newState()) {
     case QGst::StatePlaying:
+        qDebug() << "now playing!!!";
+        Q_EMIT loopCheck();
         jam_positionTimer.start(100);
         break;
     case QGst::StatePaused:

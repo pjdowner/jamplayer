@@ -44,6 +44,22 @@ QJsonArray Music::getLoops(QString name)
     return(a);
 }
 
+QJsonObject Music::getLoop(QString sName, QString lName)
+{
+    QJsonArray a = getLoops(sName);
+    QJsonObject jo = {};
+
+    for (int i=0; i < a.size(); i++) {
+        if (a[i].isObject()) {
+            jo = a[i].toObject();
+            if (QString::compare(jo.value("name").toString(), lName, Qt::CaseInsensitive) == 0) {
+                return jo;
+            }
+        }
+    }
+    return jo;
+}
+
 float Music::getTempo(QString name){
     qDebug() << "search: " << name;
 

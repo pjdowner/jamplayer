@@ -57,6 +57,7 @@ Q_SIGNALS:
     void positionChanged();
     void stateChanged();
     void durationChanged();
+    void loopCheck();
 
 private:
 

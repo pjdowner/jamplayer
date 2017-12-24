@@ -35,7 +35,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     jam_player = new Player(this);
     connect(jam_player, SIGNAL(stateChanged()), this, SLOT(onStateChanged()));
-    connect(jam_player, SIGNAL(durationChanged()), this, SLOT(onDurationChanged()));
+    connect(jam_player, SIGNAL(durationChanged()), this, SLOT(onDurationChanged()));    
+    connect(jam_player, SIGNAL(loopCheck()), this, SLOT(checkLoopStatus()));
 
     MD = new Music(this);
 
@@ -238,11 +239,25 @@ void MainWindow::createUI(QBoxLayout *appLayout)
 
 }
 
+void MainWindow::checkLoopStatus()
+{
+    qDebug() << "Loop!!!!!!";
+    if (loopMode() && (jam_player->position() < startTime)) {
+        jam_player->setPosition(startTime);
+    }
+}
+
 void MainWindow::onLoopChanged()
 {
+    QListWidgetItem *curr = songList->currentItem();
     QListWidgetItem *currLoop = loopList->currentItem();
-    QJsonArray l = MD->getLoops(curr->text());
+    QJsonObject l = MD->getLoop(curr->text(), currLoop->text());
 
+    loopStart->setText(l.value("start").toString());
+    loopStop->setText(l.value("stop").toString());
+    startTime = QTime::fromString(l.value("start").toString(), "hh:mm:ss.zzz");
+    stopTime = QTime::fromString(l.value("stop").toString(), "hh:mm:ss.zzz");
+    qDebug() << startTime << stopTime;
 
 }
 
@@ -465,6 +480,18 @@ void MainWindow::open()
     }
 }
 
+bool MainWindow::loopMode()
+{
+    QString item = loopList->currentItem()->text();
+    if (item.compare("All", Qt::CaseInsensitive) == 0)
+    {
+        return false;
+    }
+
+    return true;
+
+}
+
 /* Called when the duration of a song changes */
 void MainWindow::onDurationChanged()
 {
@@ -474,7 +501,11 @@ void MainWindow::onDurationChanged()
     {
         length = jam_player->length();
     }
-    loopStop->setText(length.toString("hh:mm:ss.zzz"));
+
+    if (!loopMode())
+    {
+        loopStop->setText(length.toString("hh:mm:ss.zzz"));
+    }
 }
 
 /* Called when the positionChanged() is received from the player */
@@ -493,7 +524,7 @@ void MainWindow::onPositionChanged()
     }
 
 
-    //qDebug() << curpos << " : " << loop << " : " << target;
+    qDebug() << stopTime << " : " << loop << " : " << startTime;
     if ((stopTime > QTime(0,0)) && (curpos >= stopTime)) {
         //qDebug() << "meep";
         jam_player->setPosition(startTime);
@@ -567,6 +598,9 @@ void MainWindow::openFile(const QString & fileName, const float pitch, const flo
 void MainWindow::play()
 {
     jam_player->play();
+    if (loopMode()) {
+        jam_player->setPosition(startTime);
+    }
 }
 
 
