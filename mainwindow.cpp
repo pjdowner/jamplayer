@@ -257,6 +257,7 @@ void MainWindow::onLoopChanged()
     loopStop->setText(l.value("stop").toString());
     startTime = QTime::fromString(l.value("start").toString(), "hh:mm:ss.zzz");
     stopTime = QTime::fromString(l.value("stop").toString(), "hh:mm:ss.zzz");
+    loopName->setText(currLoop->text());
     qDebug() << startTime << stopTime;
 
 }
@@ -322,6 +323,8 @@ void MainWindow::keyed(int k)
         t = t.addSecs(-10);
         qDebug() << t;
         jam_player->setPosition(t);
+
+    } else if (k == Qt::Key_Delete) {
 
     }
 
@@ -431,14 +434,27 @@ void MainWindow::saveLoop()
     QString lname = loopName->text();
     QListWidgetItem *curr = songList->currentItem();
     QJsonArray loops = MD->getLoops(curr->text());
+    QJsonObject l = MD->getLoop(curr->text(), lname);
 
     QJsonObject loop = {
-                            {"name", lname},
-                            {"start", startTime.toString("hh:mm:ss.zzz")},
-                            {"stop", stopTime.toString("hh:mm:ss.zzz")}
-                       };
+                        {"name", lname},
+                        {"start", startTime.toString("hh:mm:ss.zzz")},
+                        {"stop", stopTime.toString("hh:mm:ss.zzz")}
+                   };
 
-    loops.append(loop);
+
+    if (l.isEmpty()) {
+
+        loops.append(loop);
+    } else {
+        for (int i = 0; i < loops.size(); i++)
+        {
+            QJsonObject jo = loops[i].toObject();
+            if (QString::compare(jo.value("name").toString(), lname, Qt::CaseInsensitive) == 0) {
+                loops.replace(i,loop);
+            }
+        }
+    }
 
     QJsonObject details {
         {"name", curr->text()},
