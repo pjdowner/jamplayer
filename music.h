@@ -42,6 +42,7 @@ public:
     float getTempo(QString name);
     void addSong(QJsonObject song);
     void updateSong(QJsonObject details);
+    QJsonObject getSongInfo(QString name);
 
 private:
     QJsonArray ja;

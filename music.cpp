@@ -29,20 +29,32 @@ Music::~Music()
 
 }
 
+QJsonObject Music::getSongInfo(QString name)
+{
+    for (int i=0; i < ja.size(); i++) {
+        if (ja[i].isObject()) {
+            QJsonObject jo = ja[i].toObject();
+            if (QString::compare( jo.value("name").toString(), name, Qt::CaseInsensitive) == 0){
+               return jo;
+            }
+        }
+    }
 
+    return(QJsonObject {});
+}
 
 QJsonArray Music::getLoops(QString name)
 {
     qDebug() << "search: " << name;
     QJsonArray a = {};
-    for (int i=0; i < ja.size(); i++) {
-        if (ja[i].isObject()) {
-            QJsonObject jo = ja[i].toObject();
-            if (QString::compare( jo.value("name").toString(), name, Qt::CaseInsensitive) == 0){
-               return jo.value("loops").toArray();
-            }
-        }
+    QJsonObject jo;
+
+    jo = getSongInfo(name);
+
+    if (!jo.isEmpty()) {
+        a = jo.value("loops").toArray();
     }
+
     return(a);
 }
 
@@ -64,13 +76,12 @@ QJsonObject Music::getLoop(QString sName, QString lName)
 
 float Music::getTempo(QString name){
     qDebug() << "search: " << name;
+    QJsonObject jo = getSongInfo(name);
 
-    for (int i =0; i < ja.size(); i++) {
-        if (ja[i].isObject()) {
-            QJsonObject jo = ja[i].toObject();
-            if (QString::compare( jo.value("name").toString(), name, Qt::CaseInsensitive) == 0){
-                qDebug() << "getpitch " << jo.value("tempo");
-
+    if (!jo.isEmpty()) {
+        if (QString::compare( jo.value("name").toString(), name, Qt::CaseInsensitive) == 0){
+            qDebug() << "getTempo " << jo.value("tempo");
+            if (!jo.value("tempo").isUndefined()) {
                 return jo.value("tempo").toDouble();
             }
         }
@@ -81,12 +92,12 @@ float Music::getTempo(QString name){
 float Music::getPitch(QString name){
     qDebug() << "search: " << name;
 
-    for (int i =0; i < ja.size(); i++) {
-        if (ja[i].isObject()) {
-            QJsonObject jo = ja[i].toObject();
-            if (QString::compare( jo.value("name").toString(), name, Qt::CaseInsensitive) == 0){
-                qDebug() << "getpitch " << jo.value("pitch");
+    QJsonObject jo = getSongInfo(name);
 
+    if (!jo.isEmpty()) {
+        if (QString::compare( jo.value("name").toString(), name, Qt::CaseInsensitive) == 0){
+            qDebug() << "getpitch " << jo.value("pitch");
+            if (!jo.value("pitch").isUndefined()) {
                 return jo.value("pitch").toDouble();
             }
         }
@@ -97,13 +108,12 @@ float Music::getPitch(QString name){
 QString Music::getLocation(QString name){
     qDebug() << "search: " << name;
 
-    for (int i =0; i < ja.size(); i++) {
-        if (ja[i].isObject()) {
-            QJsonObject jo = ja[i].toObject();
-            if (QString::compare( jo.value("name").toString(), name, Qt::CaseInsensitive) == 0){
-                qDebug() << jo.value("location");
-                return jo.value("location").toString();
-            }
+    QJsonObject jo = getSongInfo(name);
+
+    if (!jo.isEmpty()) {
+        if (QString::compare( jo.value("name").toString(), name, Qt::CaseInsensitive) == 0){
+            qDebug() << jo.value("location");
+            return jo.value("location").toString();
         }
     }
     return("");

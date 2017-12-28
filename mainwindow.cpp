@@ -268,11 +268,8 @@ void MainWindow::onSongChanged()
 
     QJsonArray l = MD->getLoops(curr->text());
 
-    if ( !l.isEmpty()) {
-      updateLoopList(l);
-    } else {
-        loopList->clear();
-    }
+    updateLoopList(l);
+    onLoopChanged();
 
 }
 
