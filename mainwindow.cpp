@@ -89,9 +89,6 @@ void MainWindow::updateList(QJsonArray ja)
             QJsonObject jo = ja[i].toObject();
             qDebug() << jo.value("name").toString();
             new QListWidgetItem(jo.value("name").toString(), songList );
-            if (jo.value("loops").isArray()){
-                updateLoopList(jo.value("loops").toArray());
-            }
         }
     }
 
@@ -236,6 +233,8 @@ void MainWindow::createUI(QBoxLayout *appLayout)
 
     appLayout->addLayout(btnLayout);
 
+    songList->setCurrentRow(0);
+    onSongChanged();
 
 }
 
@@ -251,14 +250,26 @@ void MainWindow::onLoopChanged()
 {
     QListWidgetItem *curr = songList->currentItem();
     QListWidgetItem *currLoop = loopList->currentItem();
+    qDebug() << "loop change: " << curr->text() << " - " << currLoop->text();
     QJsonObject l = MD->getLoop(curr->text(), currLoop->text());
 
-    loopStart->setText(l.value("start").toString());
-    loopStop->setText(l.value("stop").toString());
-    startTime = QTime::fromString(l.value("start").toString(), "hh:mm:ss.zzz");
-    stopTime = QTime::fromString(l.value("stop").toString(), "hh:mm:ss.zzz");
-    loopName->setText(currLoop->text());
-    qDebug() << startTime << stopTime;
+    if (loopMode()) {
+
+        loopStart->setText(l.value("start").toString());
+        loopStop->setText(l.value("stop").toString());
+        startTime = QTime::fromString(l.value("start").toString(), "hh:mm:ss.zzz");
+        stopTime = QTime::fromString(l.value("stop").toString(), "hh:mm:ss.zzz");
+        loopName->setText(currLoop->text());
+        qDebug() << startTime << stopTime;
+
+    } else {
+        loopStart->setText("00.00.00.000");
+        loopStop->setText(jam_player->length().toString());
+        startTime = QTime::fromString("00.00.00.000");
+        stopTime = jam_player->length();
+        loopName->setText("");
+
+    }
 
 }
 
@@ -374,12 +385,36 @@ void MainWindow::pitchUp()
 
 void MainWindow::slowDown()
 {
-
+    QListWidgetItem *curr = songList->currentItem();
+    QTime oldTime = jam_player->length();
     float tempo = jam_player->getTempo();
+
     tempo -= 0.05;
     jam_player->setTempo(tempo);
     updateTempoLabel(tempo);
-    QListWidgetItem *curr = songList->currentItem();
+
+    QTime newTime = jam_player->length();
+
+    int difference;
+
+    qDebug() << "slow down";
+
+    difference = oldTime.msecsTo(newTime);
+
+    float diff = (float)difference / (float)oldTime.msecsSinceStartOfDay();
+
+    qDebug() << "difference = " << diff;
+
+    int startDiff = startTime.msecsSinceStartOfDay() * diff;
+    int stopDiff = stopTime.msecsSinceStartOfDay() * diff;
+
+    startTime = startTime.addMSecs(startDiff);
+    stopTime = stopTime.addMSecs(stopDiff);
+
+    loopStart->setText(startTime.toString("hh:mm:ss.zzz"));
+    loopStop->setText(stopTime.toString("hh:mm:ss.zzz"));
+
+    jam_player->setPosition(startTime);
 
     QJsonObject details {{"name", curr->text()}, {"field", "tempo"}, {"tempo", tempo}};
     MD->updateSong(details);
@@ -537,7 +572,7 @@ void MainWindow::onPositionChanged()
     }
 
 
-    qDebug() << stopTime << " : " << loop << " : " << startTime;
+    //qDebug() << stopTime << " : " << loop << " : " << startTime;
     if ((stopTime > QTime(0,0)) && (curpos >= stopTime)) {
         //qDebug() << "meep";
         jam_player->setPosition(startTime);
