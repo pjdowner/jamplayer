@@ -383,6 +383,16 @@ void MainWindow::pitchUp()
 
 }
 
+void MainWindow::timeDiff(QTime shortTime, QTime longTime, int *startdiff, int *stopdiff)
+{
+    int difference = shortTime.msecsTo(longTime);
+
+    float diff = (float)difference / (float)shortTime.msecsSinceStartOfDay();
+
+    *startdiff = startTime.msecsSinceStartOfDay() * diff;
+    *stopdiff = stopTime.msecsSinceStartOfDay() *diff;
+}
+
 void MainWindow::slowDown()
 {
     QListWidgetItem *curr = songList->currentItem();
@@ -395,18 +405,10 @@ void MainWindow::slowDown()
 
     QTime newTime = jam_player->length();
 
-    int difference;
+    int startDiff;
+    int stopDiff;
 
-    qDebug() << "slow down";
-
-    difference = oldTime.msecsTo(newTime);
-
-    float diff = (float)difference / (float)oldTime.msecsSinceStartOfDay();
-
-    qDebug() << "difference = " << diff;
-
-    int startDiff = startTime.msecsSinceStartOfDay() * diff;
-    int stopDiff = stopTime.msecsSinceStartOfDay() * diff;
+    timeDiff(oldTime, newTime, &startDiff, &stopDiff);
 
     startTime = startTime.addMSecs(startDiff);
     stopTime = stopTime.addMSecs(stopDiff);
@@ -423,12 +425,17 @@ void MainWindow::slowDown()
 
 void MainWindow::speedUp()
 {
+    QListWidgetItem *curr = songList->currentItem();
     float tempo = jam_player->getTempo();
+    QTime oldTime = jam_player->length();
+
     tempo += 0.05;
     jam_player->setTempo(tempo);
     updateTempoLabel(tempo);
 
-    QListWidgetItem *curr = songList->currentItem();
+    QTime newTime = jam_player->length();
+
+
 
     QJsonObject details {{"name", curr->text()}, {"field", "tempo"}, {"tempo", tempo}};
     MD->updateSong(details);
