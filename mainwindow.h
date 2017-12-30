@@ -76,7 +76,7 @@ private Q_SLOTS:
     void saveLoop();
     bool loopMode();
     void checkLoopStatus();
-    void timeDiff(QTime shortTime, QTime longTime, int *startdiff, int *stopdiff);
+    void timeDiff(float rate);
 
 private:
     Player *jam_player;
