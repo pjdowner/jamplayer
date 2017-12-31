@@ -254,14 +254,7 @@ void MainWindow::onLoopChanged()
     QJsonObject l = MD->getLoop(curr->text(), currLoop->text());
 
     if (loopMode()) {
-
-        loopStart->setText(l.value("start").toString());
-        loopStop->setText(l.value("stop").toString());
-        startTime = QTime::fromString(l.value("start").toString(), "hh:mm:ss.zzz");
-        stopTime = QTime::fromString(l.value("stop").toString(), "hh:mm:ss.zzz");
-        loopName->setText(currLoop->text());
-        qDebug() << startTime << stopTime;
-
+        timeDiff(0.0);
     } else {
         loopStart->setText("00.00.00.000");
         loopStop->setText(jam_player->length().toString());
@@ -387,8 +380,19 @@ void MainWindow::pitchUp()
 void MainWindow::timeDiff(float rate)
 {
     QListWidgetItem *curr = songList->currentItem();
-    QTime oldTime = jam_player->length();
+
     float tempo = jam_player->getTempo();
+
+    jam_player->setTempo(1.0);
+    QTime oldTime = jam_player->length();
+
+    QString lname = loopName->text();
+
+    if (loopMode()) {
+        QJsonObject l = MD->getLoop(curr->text(), lname);
+        startTime = QTime::fromString(l.value("start").toString(), "hh:mm:ss.zzz");
+        stopTime = QTime::fromString(l.value("stop").toString(), "hh:mm:ss.zzz");
+    }
 
     tempo += rate;
     jam_player->setTempo(tempo);
@@ -419,7 +423,9 @@ void MainWindow::timeDiff(float rate)
     loopStart->setText(startTime.toString("hh:mm:ss.zzz"));
     loopStop->setText(stopTime.toString("hh:mm:ss.zzz"));
 
-    jam_player->setPosition(startTime);
+    if (loopMode()) {
+        jam_player->setPosition(startTime);
+    }
 
     QJsonObject details {{"name", curr->text()}, {"field", "tempo"}, {"tempo", tempo}};
     MD->updateSong(details);
