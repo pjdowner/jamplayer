@@ -381,6 +381,12 @@ void MainWindow::timeDiff(float rate)
 {
     QListWidgetItem *curr = songList->currentItem();
 
+    qDebug() << "state - " << jam_player->state();
+    if (jam_player->state() != QGst::StateReady ||
+        jam_player->state() == QGst::StateNull) {
+        loadFile();
+    }
+
     float tempo = jam_player->getTempo();
 
     jam_player->setTempo(1.0);
@@ -645,9 +651,11 @@ void MainWindow::openFile(const QString & fileName, const float pitch, const flo
     updatePitchLabel(pitch);
     updateTempoLabel(tempo);
 
-    QTimer::singleShot(5000, this, SLOT(play()));
-
-    //jam_player->play();
+    if (loopMode()) {
+        play();
+    } else {
+        QTimer::singleShot(5000, this, SLOT(play()));
+    }
 }
 
 void MainWindow::play()
