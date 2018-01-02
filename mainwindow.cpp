@@ -240,8 +240,9 @@ void MainWindow::createUI(QBoxLayout *appLayout)
 
 void MainWindow::checkLoopStatus()
 {
-    qDebug() << "Loop!!!!!!";
+    qDebug() << "checkLoopStatus - startTime " << startTime << " stopTime " << stopTime;
     if (loopMode() && (jam_player->position() < startTime)) {
+        qDebug() << "Loop!!!!!!";
         jam_player->setPosition(startTime);
     }
 }
@@ -339,6 +340,9 @@ void MainWindow::loadFile()
 
     float p = MD->getPitch(curr->text());
     float t = MD->getTempo(curr->text());
+
+    startTime = QTime(0,0);
+    stopTime = QTime(0,0);
 
     if (jam_player->state() == QGst::StatePaused) {
             jam_player->play();
