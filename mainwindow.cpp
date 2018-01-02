@@ -384,9 +384,9 @@ void MainWindow::pitchUp()
 void MainWindow::timeDiff(float rate)
 {
     QListWidgetItem *curr = songList->currentItem();
-
+    qDebug() << "timeDiff";
     qDebug() << "state - " << jam_player->state();
-    if (jam_player->state() != QGst::StateReady ||
+    if (jam_player->state() == QGst::StateReady ||
         jam_player->state() == QGst::StateNull) {
         loadFile();
     }
