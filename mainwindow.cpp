@@ -255,6 +255,7 @@ void MainWindow::onLoopChanged()
     QJsonObject l = MD->getLoop(curr->text(), currLoop->text());
 
     if (loopMode()) {
+        loopName->setText(currLoop->text());
         timeDiff(0.0);
     } else {
         loopStart->setText("00.00.00.000");
@@ -480,10 +481,12 @@ void MainWindow::getTime(bool start)
 
 void MainWindow::saveLoop()
 {
-    QString lname = loopName->text();
     QListWidgetItem *curr = songList->currentItem();
-    QJsonArray loops = MD->getLoops(curr->text());
-    QJsonObject l = MD->getLoop(curr->text(), lname);
+    QString lname = loopName->text();
+    QString sname = curr->text();
+
+    QJsonArray loops = MD->getLoops(sname);
+    QJsonObject l = MD->getLoop(sname, lname);
 
     QJsonObject loop = {
                         {"name", lname},

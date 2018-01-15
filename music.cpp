@@ -61,6 +61,7 @@ QJsonArray Music::getLoops(QString name)
 QJsonObject Music::getLoop(QString sName, QString lName)
 {
     QJsonArray a = getLoops(sName);
+    QJsonObject fail = {};
     QJsonObject jo = {};
 
     for (int i=0; i < a.size(); i++) {
@@ -71,7 +72,7 @@ QJsonObject Music::getLoop(QString sName, QString lName)
             }
         }
     }
-    return jo;
+    return fail;
 }
 
 float Music::getTempo(QString name){
